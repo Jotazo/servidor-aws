@@ -67,3 +67,56 @@
 - Volvemos al menú y tendremos nuestra instancia ya corriendo:
 
 ![Instancia Corriendo](./screen-captures/creacion-instancia-aws/instancia-creada.png)
+
+---
+
+## Entrando a nuestro servidor
+
+---
+
+  > ### Nota
+  > Yo utilizo Windows 10 para la configuración y `Git Bash`. Para los que no tengais instalado `Git Bash` os recomiendo [éste](https://www.stanleyulili.com/git/how-to-install-git-bash-on-windows/) tutorial para su instalación. Para seguir avanzando deberemos tener instalado `Git Bash`
+
+- A continuación pasaremos a entrar a nuestro servidor. Desde el escritorio haremos click derecho y seleccionaremos `Git Bash Here`:
+
+![Git Bash Here](./screen-captures/entrando-servidor/git-bash-here.png)
+
+- Una vez seleccionada, nos aparecerá la terminal:
+
+![Git Bash Terminal](./screen-captures/entrando-servidor/git-bash-terminal.png)
+
+- Utilizaremos el siguiente comando para entrar en nuestro servidor `ssh -i <direccion_de_la_key> <usuario-servidor>@<ip_servidor>`
+
+  > ### Explicación del comando:
+
+  > SSH (o Secure SHell) es el nombre de un protocolo y del programa que lo implementa cuya principal función es el acceso remoto a un servidor por medio de un canal seguro en el que toda la información está cifrada. Extraido de [Wikipedia](https://es.wikipedia.org/wiki/Secure_Shell)
+
+  > flag `-i`: Con esta flag le indicamos que le pasaremos una clave como siguiente parametro
+
+  > `direccion_de_la_key`: Aqui introduciremos o, la ruta relativa al archivo clave descargado con anterioridad o la ruta absoluta
+
+  > `usuario-servidor`: El usuario, en mi caso, será `ubuntu`, pues he seleccionado esa máquina
+
+  > `ip_servidor`: La ip la obtendremos en la consola de aws, seleccionaremos nuestra instancia y deberemos copiar la `Public IPv4 address`:
+
+  ![Ip Servidor](./screen-captures/entrando-servidor/ip-servidor.png)
+
+- En mi caso, como tengo la clave en el escritorio, mi comando será éste:
+
+![Comando servidor](./screen-captures/entrando-servidor/mi-comando-servidor.png)
+
+- Cuando pulsemos `INTRO` nos aparecerá la siguiente pantalla, la cual nos advierte que no conoce dicha dirección y estamos de acuerdo en que la guardemos como una direccion conocida, simplemente introducimos `yes` y pulsamos `INTRO`:
+
+![Fingerprint](./screen-captures/entrando-servidor/fingerprint.png)
+
+- Nos aparecerá un mensaje diciendonos que se ha añadido permanentemente mente la dirección a la lista de Hosts conocidos
+
+- Una vez hecho esto, estaremos dentro de nuestro servidor
+
+---
+
+## Configurando nuestro servidor
+
+---
+
+# EN CONSTRUCCIÓN
