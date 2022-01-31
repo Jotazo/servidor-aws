@@ -23,6 +23,8 @@
       2. [Configurando NGINX](#configurando-nginx)
       3. [Configurando puerto 80 en AWS](#configurando-puerto-80-en-aws)
   4. [Incorporar un proyecto a nuestro servidor](#incorporar-un-proyecto-a-nuestro-servidor)
+      1. [Antes de adjuntar proyecto](#antes-de-adjuntar-proyecto)
+      2. [Enviando proyecto](#enviando-proyecto)
 
 
 ## Crear la instancia en AWS
@@ -202,6 +204,41 @@
 ---
 
 ## Incorporar un proyecto a nuestro servidor
+
+> ### Nota
+> El proyecto que voy a subir al servidor será [éste](https://github.com/startbootstrap/startbootstrap-freelancer) de ejemplo, que para descargarlo haremos click en el boton `code` y lo descargaremos en zip y extraeremos la carpeta `dist` en nuestro escritorio.
+
+#### Enviando proyecto
+- Una vez tengamos la carpeta `dist` en nuestro escritorio, abriremos un nuevo terminal desde el escritorio, haciendo uso del click derecho y seleccionando `Git Bash Here`
+
+- El comando que usaremos para enviar nuestra carpeta `dist` a nuestro servidor `Ubuntu` será `scp -i <ruta_certificado> -r <nombre_del_archivo_a_enviar> <donde_queremos_enviar>`. En mi caso el comando quedará así: `scp -i practica-kc.pem -r dist ubuntu@<ip>:~/`
+
+> ### Nota
+> `~/` vendría a ser lo mismo que poner `/home/ubuntu`
+
+```
+scp -i practica-kc.pem -r dist ubuntu@<ip>:~/
+scp -i practica-kc.pem -r dist ubuntu@<ip>:/home/ubuntu
+```
+
+![subiendo archivo](./screen-captures/añadir-proyecto/subiendo-archivos.png)
+
+- Veremos como se añadiran los archivos a nuestro servidor. Para ver los archivos, entraremos al servidor con el comando explicado con anterioridad `ssh -i <nombre_certificado> <nombre_servidor>@<ip_servidor>`. Una vez dentro haremos `ls -l` y deberiamos de ver la carpeta `dist`
+
+#### Antes de adjuntar proyecto
+
+- Para comprender el siguiente paso, vamos a ver el por qué. Sabemos que queremos meter el proyecto de prueba en `NGINX`, pero antes de hacerlo vamos a mirar la configuración del mismo. Nos moveremos a la carpeta de `NGINX` con `cd /etc/nginx/`. Haciendo un `ls -l` deberiamos de ver una carpeta tal que `sites-enabled`. Nos metemos en ella y dentro, debería de haber un ***link*** llamado `default`. Haciendo un `less default` en la terminal, podemos ver el archivo al que apunta, que no es mas que un archivo de condiguración. Si bajamos un poco deberiamos de ver el siguiente texto:
+
+![nginx default link](./screen-captures/añadir-proyecto/nginx-default-link.png)
+
+- Esto nos está diciendo que la raiz de nuestro servidor se encuentra en `/var/www/html`. Entonces, lo que deberemos hacer es copiar el contenido de `dist` en esa ruta.
+
+#### Adjuntando proyecto al servidor
+
+- Una vez tenemos la carpeta `dist` dentro de nuestro servidor, como bien comentabamos antes, queremos copiar el contenido de nuestra carpeta en la ruta `/var/www/html`. Para hacer esto, desde la raiz de nuestro servidor ejecutaremos el siguiente comando `sudo cp -r dist/* /var/www/html`. No nos dará ningun tipo de mensaje informativo, pero si en este momento vamos a la IPv4 publica de nuestro servidor deberiamos de estar viendo el proyecto descargado.
+
+![proyecto en servidor](./screen-captures/añadir-proyecto/proyecto-en-servidor.png)
+
 
 ---
 
