@@ -316,6 +316,40 @@ server { # Abrimos la directiva server
 
 - Recargaremos `NGINX` con `sudo service nginx reload`
 
+- Si intentamos entrar a la direccion ***PUBLIC IPv4 DNS*** nos aparecerá la pantalla en blanco, en la pestaña si que nos aparecerá `React Redux Todo App`, pero nos está fallando algo... 
+
+![error cargando proyecto](./screen-captures/añadir-proyecto-react/error-cargando-proyecto.png)
+
+- Si miramos en la pestaña `network/red` veremos lo siguiente:
+
+![error cargando proyecto ruta](./screen-captures/añadir-proyecto-react/error-cargando-proyecto-ruta.png)
+
+- Está intentando obtener los archivos estaticos desde una carpeta que no existe, pues en nuestra carpeta `build` tenemos lo siguiente: 
+
+![carpeta build](./screen-captures/añadir-proyecto-react/carpeta-build.png)
+
+- Podriamos arreglarlo creando una carpeta `react-redux-todo-app` y añadiendo ahi la carpeta `static`, pero sería una ñapa. Lo que haremos, será, irnos al proyecto, y en la raiz del mismo, crearnos un archivo `.env` en el que introduciremos lo siguiente: 
+
+```
+PUBLIC_URL=/
+```
+
+![crea env](./screen-captures/añadir-proyecto-react/crea-env.png)
+
+- Una vez creado, procederemos a realizar de nuevo la carpeta `build` con el comando `npm run build` y volvemos a enviar la carpeta al servidor con `scp -i <ruta_certificado> -r <carpeta_a_enviar> <ruta_donde_enviar>`
+
+> ### Nota
+> Se recomienda eliminar la carpeta `build` del servidor antes de realizar dicha acción
+
+- Y ahora, si entramos en la página de nuevo debería verse la aplicación
+
+![react app](./screen-captures/añadir-proyecto-react/react-app.png)
+
+[**_Ir al indice_**](#indice)
+
+---
+
+
 # EN CONSTRUCCIÓN
 
 [**_Ir al indice_**](#indice)
