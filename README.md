@@ -29,6 +29,7 @@
    1. [Antes de adjuntar proyecto](#antes-de-adjuntar-proyecto)
    2. [Enviando proyecto](#enviando-proyecto)
 5. [Incorporar un proyecto React a nuestro servidor](#incorporar-un-proyecto-react-a-nuestro-servidor)
+   1. [Solucion a SHOWACTIVE](#solucion-show-active)
 
 ## Crear la instancia en AWS
 
@@ -344,6 +345,52 @@ PUBLIC_URL=/
 - Y ahora, si entramos en la página de nuevo debería verse la aplicación
 
 ![react app](./screen-captures/añadir-proyecto-react/react-app.png)
+
+> ### Nota
+> Si hemos utilizado el proyecto de ejemplo mencionado de [Alberto Casero](https://github.com/kasappeal/react-redux-todo-app), tendremos un pequeño problema que solucionaremos a continuación
+
+## Solucion ***SHOW ACTIVE***
+---
+
+- Si accedemos al proyecto de react desde el navegador, hacemos click en `SHOW ACTIVE`, al parecer funciona correctamente. Pero si copiamos la `URL` y la pegamos en otra pestaña, veremos como nos da un error:
+
+![error show active](./screen-captures/añadir-proyecto-react/error-show-active.png)
+
+- Esto se debe, a que cuando clickamos sobre `SHOW ACTIVE` no se realiza ninguna petición HTTP, sino que React, sin hacer ningún tipo de petición HTTP te devuelve lo que pides. Pero cuando pegamos la `URL` en otra pestaña, ésta si que hace una petición HTTP. Y al buscar esa ruta no encuentra la misma, y ésto, lo definimos en nuestro archivo `todo-list` como vemos a continuación:
+
+![config todo list](./screen-captures/añadir-proyecto-react/config-todo-list.png)
+
+```zsh
+...
+location /{
+    try_files $uri $uri/ =404
+    # Intenta servir los archivos de la ruta, si no existe, 
+    # busca en una carpeta con el nombre y si no existe, Error 404
+}
+...
+```
+
+- Como la ruta `.../SHOW_ACTIVE` no existe, nos devuelve el `404`. Para ***'arreglar'*** éste inconveniente lo que haremos será modificar el archivo tal que así: 
+
+![config todo list mod](./screen-captures/añadir-proyecto-react/config-todo-list-mod.png)
+
+- Con esa modificación, lo que le decimos es:
+
+```zsh
+...
+location /{
+    try_files $uri $uri/ /index.html;
+    # Intenta servir los archivos de la ruta, si no existe, 
+    # busca en una carpeta con el nombre y si no existe, devuelveme el index.html
+    # y que React se encargue
+}
+...
+```
+
+- Una vez hacemos esta modificación, recargamos `NGINX` con `sudo service nginx reload` y si accedemos de nuevo a la que nos daba error en principio, nos deberia de funcionar tal que así:
+
+![error show active corregido](./screen-captures/añadir-proyecto-react/error-show-active-corregido.png)
+
 
 [**_Ir al indice_**](#indice)
 
