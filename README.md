@@ -30,6 +30,14 @@
    2. [Enviando proyecto](#enviando-proyecto)
 5. [Incorporar un proyecto React a nuestro servidor](#incorporar-un-proyecto-react-a-nuestro-servidor)
    1. [Solucion a SHOWACTIVE](#solucion-show-active)
+6. [Incorporar un proyecto Node a nuestro servidor](#incorporar-un-proyecto-node-a-nuestro-servidor)
+   1. [Creando usuario](#creando-usuario)
+   2. [Instalando nvm (node version manager)](#instalando-nvm)
+   3. [Instalando Node](#instalando-node)
+   4. [Instalando otra version de node](#instalando-otra-version-de-node)
+   5. [Instalando Supervisor](#instalando-supervisor)
+   6. [Configurando Supervisor](#configurando-supervisor)
+   7. [Error comando npm start](#error-comando-npm-start)
 
 ## Crear la instancia en AWS
 
@@ -396,6 +404,151 @@ location /{
 
 ---
 
+## Incorporar un proyecto Node a nuestro servidor
+
+---
+
+#### Creando usuario
+- Crearemos un usuario para que sea el que ejecute nuestra aplicacion de node en el servidor. Para ello usaremos `sudo adduser <nombre_usuario>`, en mi caso lo llamaré `chat`
+
+- Después, bloquearemos la entrada por password del mismo con el comando `sudo passwd -l <nombre_usuario>`. Con `-l`, bloqueamos la entrada por password.
+
+- Luego entraremos como el usuario que hayamos creado (en mi caso `chat`) con el comando `sudo -u <nombre_usuario> -i`.
+
+#### Instalando nvm
+- Instalaremos `nvm` para poder controlar la versión de `Node` que queremos utilizar. Usaremos el comando `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`
+
+> ### Nota
+> También podemos usar `wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`, para mas info, consulta en el repo de [nvm](https://github.com/nvm-sh/nvm)
+
+- Para que se actualicen los cambios saldremos del usuario y volveremos a entrar.
+Hacemos `logout` y volvemos a entrar con `sudo -u <nombre_usuario> -i`
+
+- Comprobaremos que tenemos nvm con el comando `nvm --version` o `nvm -v`. Nos debería de aparecer la versión tal que así: 
+
+![nvm version](./screen-captures/añadir-proyecto-node/nvm-version.png)
+
+#### Instalando Node
+
+- Para instalar `Node` usaremos el comando `nvm install node`, el cual nos instalará la última versión.
+
+![install node](./screen-captures/añadir-proyecto-node/install-node.png)
+
+#### Clonando/Fork aplicacion de Node
+
+- Para este ejemplo usaremos el repo de [igorantum](https://github.com/igorantun/node-chat) el cual deberemos de hacer un `Fork` a nuestro repo (ya entenderemos el ¿PORQUE?)
+
+- Una vez hayamos hecho el `Fork`, clonaremos desde nuestro repo el proyecto a nuestro servidor, dentro del usuario creado.
+
+![clonando repo](./screen-captures/añadir-proyecto-node/clonando-repo.png)
+
+- Entraremos dentro de la carpeta creada con el repo (en mi caso `node-chat`) e instalaremos dependencias con `npm install` o `npm i`
+
+- Despues ejecutaremos `npm start` para arrancar el proyecto y nos deberia de salir algo así:
+
+![ejecutando chat](./screen-captures/añadir-proyecto-node/ejecutando-chat.png)
+
+- Si probamos a entrar por la IP publica `<IP_PUBLICA>:3000` o por el nombre de dominio `<nombre_dominio>:3000` veremos que no podemos entrar. Esto es debido a que en nuestra instancia, en los puertos, el puerto `3000` por donde está escuchando nuestra aplicación, no está abierto.
+
+- Para abrirlo podemos seguir los mismos pasos que cuando configurabamos el [Puerto 80](#configurando-puerto-80-en-aws) lo que en este caso el `type` será Custom TCP y le añadiremos el puerto `3000`.
+
+- Si probamos a entrar ahora, veremos como nos salta el siguiente error:
+
+![error chat version node](./screen-captures/añadir-proyecto-node/error-chat-version-node.png)
+
+- Éste error, en éste caso, es debido a que la versión de Node que tenemos instalada es diferente a la de nuestro proyecto y está generando conflicto
+
+#### Instalando otra version de node
+
+- Antes de instalar otra version de node, haremos un `nvm list` para ver todas las versiones disponibles que tenemos para instalar. 
+
+![nvm list](./screen-captures/añadir-proyecto-node/nvm-list.png)
+
+- En éste caso, usaremos la version `lts/erbium`. Para ello haremos `nvm install lts/erbium` y veremos como automaticamente empezamos a usar esa versión.
+
+![instalando node erbium](./screen-captures/añadir-proyecto-node/instalando-node-erbium.png)
+
+- Volvemos a ejecutar la aplicación con `npm start` y volvemos a probar la aplicación con `<IP_PUBLICA>:3000` o `<nombre_dominio>:3000` y ahora deberia de mostrarse la aplicación correctamente
+
+- Ahora, lo que nosotros queremos es, que ésta aplicación funcione sin que nosotros tengamos que intervenir, ahí entra `Supervisor`
+
+#### Instalando Supervisor
+
+- Supervisor deberemos instalarlo para que sea un servicio del sistema, queremos decir, que lo instalaremos como `usuario sudoer`
+
+- Para ello, nos desloguearemos del usuario en el que estemos, si somos el usuario sudoer no nos hará falta, pero si seguimos en el usuario `chat` o el nombre que le hayamos puesto, haremos `logout`.
+
+- Una vez en nuestro usuario, haremos un `sudo apt install supervisor` para instalarlo
+
+#### Configurando Supervisor
+
+- Para configurar `Supervisor` nos iremos a la carpeta de configuración del mismo. `cd /etc/supervisor/conf.d`. Si hacemos `ls -l` veremos que no hay ningún archivo de configuración, pues será lo que nosotros creemos
+
+- Haremos un `sudo nano <nombre_fichero>` e introduciremos lo siguente:
+> ### Nota
+> Como usuario usaré el creado por mi con anterioridad llamado `chat`
+
+
+```zsh
+[program:chat]
+command=<comando_a_utilizar> # Comando que se usa para iniciar el proyecto
+user=chat # Usuario que ejecuta la aplicación
+directory=/home/<nombre_usuario>/node-chat # Directorio donde se encuentra la app
+autostart=true # Autoiniciar
+autorestart=true # Autoreiniciar
+```
+
+- El comando que queremos usar, como bien sabemos es, `npm start`. Queremos que cuando entremos al directorio haga un `npm start`. Introducimos ese comando entonces. 
+
+> ### Nota
+> No lo és exactamente, pero veremos en detalle el error y como solucionarlo
+
+```zsh
+[program:chat]
+command=npm start # Comando que se usa para iniciar el proyecto
+user=chat # Usuario que ejecuta la aplicación
+directory=/home/<nombre_usuario>/node-chat # Directorio donde se encuentra la app
+autostart=true # Autoiniciar
+autorestart=true # Autoreiniciar
+```
+
+#### Error comando npm start
+
+- Si intentamos entrar entonces donde alojemos el chat `<IP_PUBLICA>:3000` o `<nombre_dominio>:3000` veremos que no funciona. Donde está el problema? Debemos mirar en los logs de supervisor
+
+- Si accedemos a `cd /var/log/supervisor` y hacemos un `ls -l` deberia mostrarnos los siguientes archivos:
+
+![logs supervisor](./screen-captures/añadir-proyecto-node/logs-supervisor.png)
+
+- Si miramos dentro de `supervisord.log` con `tail supervisord.log` (para que nos muestre los últimos logs) deberiamos de ver los siguientes mensajes de error:
+
+![error npm comando](./screen-captures/añadir-proyecto-node/error-npm-comando.png)
+
+- El problema que existe es que `supervisor`, no encuentra el comando `npm start`. Esto sucede, porque `supervisor`, que lo tenemos instalado en nuestro usuario/servidor (en mi caso `ubuntu...`) no tiene instalado `node`, entonces no podemos hacer uso del comando `npm`. 
+  
+- Sabiendo que tenemos al usuario (en mi caso `chat`) que si que tiene instalado `node`, lo que deberemos hacer es, pasarle la ruta absoluta donde tenemos instalado `node`.
+
+#### Encontrando la ruta absoluta de node
+
+- Para encontrar la ruta absoluta nos logearemos como el usuario (en mi caso) `chat`. Entraremos en la carpeta `node-chat` y dentro ejecutaremos `npm start` e iremos a la `<IP_PUBLICA>:3000` o `<nombre_dominio>:3000` para comprobar que realmente funciona.
+
+![error version node default](./screen-captures/añadir-proyecto-node/error-version-node-default.png)
+
+- Nos vuelve a generar, el mismo error que nos surgía, el cual era por una version de node y en la terminal nos muestra el mismo. Que sucede?
+
+- Antes de deslogearnos para configurar supervisor, la version de node que estabamos usando era la 12. Cuando hacemos logout y volvemos a logearnos, `nvm` tiene una versión de `node` marcada por defecto. Eso lo podemos ver con `nvm ls`
+
+![nvm-version-default](./screen-captures/añadir-proyecto-node/nvm-version-default.png)
+
+- Cómo sabemos, el chat funciona correctamente con la version 12, entonces, lo que vamos a hacer es, decirle a `nvm` que la versión por defecto que debe de usar es la 12. Para hacer esto debemos de ejecutar `nvm alias default 12`. Nos mostrará el siguiente mensaje: 
+
+![nvm default 12](./screen-captures/añadir-proyecto-node/nvm-default-12.png)
+
+- Para que los cambios se hagan activos, deberemos de hacer `logout` y volver a conectarnos con el usuario. Cuando nos conectemos, haciendo un `nvm ls` podremos ver como ya tenemos por defecto la version 12 de node:
+
+![nvm version default fixed](./screen-captures/añadir-proyecto-node/nvm-version-default-fixed.png)
+
+---
 
 # EN CONSTRUCCIÓN
 
