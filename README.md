@@ -38,6 +38,8 @@
    5. [Instalando Supervisor](#instalando-supervisor)
    6. [Configurando Supervisor](#configurando-supervisor)
    7. [Error comando npm start](#error-comando-npm-start)
+   8. [Encontrando la ruta absoluta de node](#encontrando-la-ruta-absoluta-de-node)
+   9. [OPCIONAL - Estableciendo node v12 como default](#estableciendo-node-v12-como-default)
 
 ## Crear la instancia en AWS
 
@@ -308,7 +310,7 @@ server { # Abrimos la directiva server
         index index.html; # Por defecto, devuelve el index.html del proyecto
         location / { # Para cualquier ruta o petición...
                 try_files $uri $uri/ =404;
-                # Intenta servir los archivos de la ruta, si no existe, 
+                # Intenta servir los archivos de la ruta, si no existe,
                 # busca en una carpeta con el nombre y si no existe, Error 404
         }
 }
@@ -321,11 +323,12 @@ server { # Abrimos la directiva server
 - Una vez creado el archivo, lo habiliataremos creando un enlace en `/etc/nginx/sites-enabled`. Para ello nos dirigiremos a `/etc/nginx/` y crearemos el enlace con el siguiente comando `ln -s <ruta_origen_archivo> <ruta_destino_archivo>`
 
   > ### IMPORTANTE
-  > ***Las rutas del comando deben de ser rutas absolutas***
+  >
+  > **_Las rutas del comando deben de ser rutas absolutas_**
 
 - Recargaremos `NGINX` con `sudo service nginx reload`
 
-- Si intentamos entrar a la direccion ***PUBLIC IPv4 DNS*** nos aparecerá la pantalla en blanco, en la pestaña si que nos aparecerá `React Redux Todo App`, pero nos está fallando algo... 
+- Si intentamos entrar a la direccion **_PUBLIC IPv4 DNS_** nos aparecerá la pantalla en blanco, en la pestaña si que nos aparecerá `React Redux Todo App`, pero nos está fallando algo...
 
 ![error cargando proyecto](./screen-captures/añadir-proyecto-react/error-cargando-proyecto.png)
 
@@ -333,11 +336,11 @@ server { # Abrimos la directiva server
 
 ![error cargando proyecto ruta](./screen-captures/añadir-proyecto-react/error-cargando-proyecto-ruta.png)
 
-- Está intentando obtener los archivos estaticos desde una carpeta que no existe, pues en nuestra carpeta `build` tenemos lo siguiente: 
+- Está intentando obtener los archivos estaticos desde una carpeta que no existe, pues en nuestra carpeta `build` tenemos lo siguiente:
 
 ![carpeta build](./screen-captures/añadir-proyecto-react/carpeta-build.png)
 
-- Podriamos arreglarlo creando una carpeta `react-redux-todo-app` y añadiendo ahi la carpeta `static`, pero sería una ñapa. Lo que haremos, será, irnos al proyecto, y en la raiz del mismo, crearnos un archivo `.env` en el que introduciremos lo siguiente: 
+- Podriamos arreglarlo creando una carpeta `react-redux-todo-app` y añadiendo ahi la carpeta `static`, pero sería una ñapa. Lo que haremos, será, irnos al proyecto, y en la raiz del mismo, crearnos un archivo `.env` en el que introduciremos lo siguiente:
 
 ```
 PUBLIC_URL=/
@@ -348,6 +351,7 @@ PUBLIC_URL=/
 - Una vez creado, procederemos a realizar de nuevo la carpeta `build` con el comando `npm run build` y volvemos a enviar la carpeta al servidor con `scp -i <ruta_certificado> -r <carpeta_a_enviar> <ruta_donde_enviar>`
 
 > ### Nota
+>
 > Se recomienda eliminar la carpeta `build` del servidor antes de realizar dicha acción
 
 - Y ahora, si entramos en la página de nuevo debería verse la aplicación
@@ -355,9 +359,11 @@ PUBLIC_URL=/
 ![react app](./screen-captures/añadir-proyecto-react/react-app.png)
 
 > ### Nota
+>
 > Si hemos utilizado el proyecto de ejemplo mencionado de [Alberto Casero](https://github.com/kasappeal/react-redux-todo-app), tendremos un pequeño problema que solucionaremos a continuación
 
-## Solucion ***SHOW ACTIVE***
+## Solucion **_SHOW ACTIVE_**
+
 ---
 
 - Si accedemos al proyecto de react desde el navegador, hacemos click en `SHOW ACTIVE`, al parecer funciona correctamente. Pero si copiamos la `URL` y la pegamos en otra pestaña, veremos como nos da un error:
@@ -372,13 +378,13 @@ PUBLIC_URL=/
 ...
 location /{
     try_files $uri $uri/ =404
-    # Intenta servir los archivos de la ruta, si no existe, 
+    # Intenta servir los archivos de la ruta, si no existe,
     # busca en una carpeta con el nombre y si no existe, Error 404
 }
 ...
 ```
 
-- Como la ruta `.../SHOW_ACTIVE` no existe, nos devuelve el `404`. Para ***'arreglar'*** éste inconveniente lo que haremos será modificar el archivo tal que así: 
+- Como la ruta `.../SHOW_ACTIVE` no existe, nos devuelve el `404`. Para **_'arreglar'_** éste inconveniente lo que haremos será modificar el archivo tal que así:
 
 ![config todo list mod](./screen-captures/añadir-proyecto-react/config-todo-list-mod.png)
 
@@ -388,7 +394,7 @@ location /{
 ...
 location /{
     try_files $uri $uri/ /index.html;
-    # Intenta servir los archivos de la ruta, si no existe, 
+    # Intenta servir los archivos de la ruta, si no existe,
     # busca en una carpeta con el nombre y si no existe, devuelveme el index.html
     # y que React se encargue
 }
@@ -399,7 +405,6 @@ location /{
 
 ![error show active corregido](./screen-captures/añadir-proyecto-react/error-show-active-corregido.png)
 
-
 [**_Ir al indice_**](#indice)
 
 ---
@@ -409,6 +414,7 @@ location /{
 ---
 
 #### Creando usuario
+
 - Crearemos un usuario para que sea el que ejecute nuestra aplicacion de node en el servidor. Para ello usaremos `sudo adduser <nombre_usuario>`, en mi caso lo llamaré `chat`
 
 - Después, bloquearemos la entrada por password del mismo con el comando `sudo passwd -l <nombre_usuario>`. Con `-l`, bloqueamos la entrada por password.
@@ -416,15 +422,17 @@ location /{
 - Luego entraremos como el usuario que hayamos creado (en mi caso `chat`) con el comando `sudo -u <nombre_usuario> -i`.
 
 #### Instalando nvm
+
 - Instalaremos `nvm` para poder controlar la versión de `Node` que queremos utilizar. Usaremos el comando `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`
 
 > ### Nota
+>
 > También podemos usar `wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`, para mas info, consulta en el repo de [nvm](https://github.com/nvm-sh/nvm)
 
 - Para que se actualicen los cambios saldremos del usuario y volveremos a entrar.
-Hacemos `logout` y volvemos a entrar con `sudo -u <nombre_usuario> -i`
+  Hacemos `logout` y volvemos a entrar con `sudo -u <nombre_usuario> -i`
 
-- Comprobaremos que tenemos nvm con el comando `nvm --version` o `nvm -v`. Nos debería de aparecer la versión tal que así: 
+- Comprobaremos que tenemos nvm con el comando `nvm --version` o `nvm -v`. Nos debería de aparecer la versión tal que así:
 
 ![nvm version](./screen-captures/añadir-proyecto-node/nvm-version.png)
 
@@ -460,7 +468,7 @@ Hacemos `logout` y volvemos a entrar con `sudo -u <nombre_usuario> -i`
 
 #### Instalando otra version de node
 
-- Antes de instalar otra version de node, haremos un `nvm list` para ver todas las versiones disponibles que tenemos para instalar. 
+- Antes de instalar otra version de node, haremos un `nvm list` para ver todas las versiones disponibles que tenemos para instalar.
 
 ![nvm list](./screen-captures/añadir-proyecto-node/nvm-list.png)
 
@@ -484,10 +492,11 @@ Hacemos `logout` y volvemos a entrar con `sudo -u <nombre_usuario> -i`
 
 - Para configurar `Supervisor` nos iremos a la carpeta de configuración del mismo. `cd /etc/supervisor/conf.d`. Si hacemos `ls -l` veremos que no hay ningún archivo de configuración, pues será lo que nosotros creemos
 
-- Haremos un `sudo nano <nombre_fichero>` e introduciremos lo siguente:
-> ### Nota
-> Como usuario usaré el creado por mi con anterioridad llamado `chat`
-
+- Haremos un `sudo nano <nombre_fichero>.conf` e introduciremos lo siguente:
+  > ### Nota
+  >
+  > Como usuario usaré el creado por mi con anterioridad llamado `chat`
+  > Le añadimos la extension `.conf` al archivo que crearemos para que `supervisor` reconozca el archivo de configuración del chat
 
 ```zsh
 [program:chat]
@@ -498,9 +507,10 @@ autostart=true # Autoiniciar
 autorestart=true # Autoreiniciar
 ```
 
-- El comando que queremos usar, como bien sabemos es, `npm start`. Queremos que cuando entremos al directorio haga un `npm start`. Introducimos ese comando entonces. 
+- El comando que queremos usar, como bien sabemos es, `npm start`. Queremos que cuando entremos al directorio haga un `npm start`. Introducimos ese comando entonces.
 
 > ### Nota
+>
 > No lo és exactamente, pero veremos en detalle el error y como solucionarlo
 
 ```zsh
@@ -524,29 +534,46 @@ autorestart=true # Autoreiniciar
 
 ![error npm comando](./screen-captures/añadir-proyecto-node/error-npm-comando.png)
 
-- El problema que existe es que `supervisor`, no encuentra el comando `npm start`. Esto sucede, porque `supervisor`, que lo tenemos instalado en nuestro usuario/servidor (en mi caso `ubuntu...`) no tiene instalado `node`, entonces no podemos hacer uso del comando `npm`. 
-  
+- El problema que existe es que `supervisor`, no encuentra el comando `npm start`. Esto sucede, porque `supervisor`, que lo tenemos instalado en nuestro usuario/servidor (en mi caso `ubuntu...`) no tiene instalado `node`, entonces no podemos hacer uso del comando `npm`.
+
 - Sabiendo que tenemos al usuario (en mi caso `chat`) que si que tiene instalado `node`, lo que deberemos hacer es, pasarle la ruta absoluta donde tenemos instalado `node`.
 
 #### Encontrando la ruta absoluta de node
 
-- Para encontrar la ruta absoluta nos logearemos como el usuario (en mi caso) `chat`. Entraremos en la carpeta `node-chat` y dentro ejecutaremos `npm start` e iremos a la `<IP_PUBLICA>:3000` o `<nombre_dominio>:3000` para comprobar que realmente funciona.
+- Para encontrar la ruta absoluta nos logearemos como el usuario (en mi caso) `chat`. 
 
-![error version node default](./screen-captures/añadir-proyecto-node/error-version-node-default.png)
+- Una vez dentro del usuario pasaremos a ejecutar el comando `which node` el cual nos devolverá la ruta absoluta a `node`:
 
-- Nos vuelve a generar, el mismo error que nos surgía, el cual era por una version de node y en la terminal nos muestra el mismo. Que sucede?
+![node ruta absoluta](./screen-captures/añadir-proyecto-node/node-ruta-absoluta.png)
 
-- Antes de deslogearnos para configurar supervisor, la version de node que estabamos usando era la 12. Cuando hacemos logout y volvemos a logearnos, `nvm` tiene una versión de `node` marcada por defecto. Eso lo podemos ver con `nvm ls`
+- Esa será la ruta a introducir en el archivo de configuración de `supervisor`. Nos dirigimos con el usuario `ubuntu` a `cd /etc/supervisor/conf.d` y actualizamos el archivo de configuración que creamos anteriormente, en mi caso `chat.conf`, haciendo `sudo nano chat.conf` y dejando el archivo tal que así:
 
-![nvm-version-default](./screen-captures/añadir-proyecto-node/nvm-version-default.png)
+> ### Nota
+> Añadimos `app.js` pues es el archivo al que debemos hacerle un `node` 
+> El comando `/home/chat/.nvm/versions/node/v12.22.10/bin/node app.js` sería como desde el usuario `chat`, desde la carpeta `node-chat`, hacer un `node app.js`
 
-- Cómo sabemos, el chat funciona correctamente con la version 12, entonces, lo que vamos a hacer es, decirle a `nvm` que la versión por defecto que debe de usar es la 12. Para hacer esto debemos de ejecutar `nvm alias default 12`. Nos mostrará el siguiente mensaje: 
+![chat conf arreglado comando](./screen-captures/añadir-proyecto-node/chat-conf-arreglado-comando.png)
 
-![nvm default 12](./screen-captures/añadir-proyecto-node/nvm-default-12.png)
 
-- Para que los cambios se hagan activos, deberemos de hacer `logout` y volver a conectarnos con el usuario. Cuando nos conectemos, haciendo un `nvm ls` podremos ver como ya tenemos por defecto la version 12 de node:
+  #### Estableciendo node v12 como default
 
-![nvm version default fixed](./screen-captures/añadir-proyecto-node/nvm-version-default-fixed.png)
+  - Como usuario `chat` entraremos en la carpeta `node-chat` y dentro ejecutaremos `npm start` e iremos a la `<IP_PUBLICA>:3000` o `<nombre_dominio>:3000` para comprobar que realmente funciona.
+
+    ![error version node default](./screen-captures/añadir-proyecto-node/error-version-node-default.png)
+
+  - Nos vuelve a generar, el mismo error que nos surgía, el cual era por una version de node y en la terminal nos muestra el mismo. Que sucede?
+  
+  - Antes de deslogearnos para configurar supervisor, la version de node que estabamos usando era la 12. Cuando hacemos logout y volvemos a logearnos, `nvm` tiene una versión de `node` marcada por defecto. Eso lo podemos ver con `nvm ls`
+
+    ![nvm-version-default](./screen-captures/añadir-proyecto-node/nvm-version-default.png)
+
+  - Cómo sabemos, el chat funciona correctamente con la version 12, entonces, lo que vamos a hacer es, decirle a `nvm` que la versión por defecto que debe de usar es la 12. Para hacer esto debemos de ejecutar `nvm alias default 12`. Nos mostrará el siguiente mensaje:
+
+    ![nvm default 12](./screen-captures/añadir-proyecto-node/nvm-default-12.png)
+
+  - Para que los cambios se hagan activos, deberemos de hacer `logout` y volver a conectarnos con el usuario. Cuando nos conectemos, haciendo un `nvm ls` podremos ver como ya tenemos por defecto la version 12 de node:
+
+    ![nvm version default fixed](./screen-captures/añadir-proyecto-node/nvm-version-default-fixed.png)
 
 ---
 
