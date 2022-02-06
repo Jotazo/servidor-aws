@@ -544,7 +544,11 @@ autorestart=true # Autoreiniciar
 
 - Una vez dentro del usuario pasaremos a ejecutar el comando `which node` el cual nos devolverá la ruta absoluta a `node`:
 
-![node ruta absoluta](./screen-captures/añadir-proyecto-node/node-ruta-absoluta.png)
+![version node buscando ruta](./screen-captures/añadir-proyecto-node/version-node-buscando-ruta.png)
+
+- Como bien sabemos, la versión de node que sabemos que funciona con el chat, es la v12. Usaremos el comando `nvm use 12` y despues volveremos a ejecutar `which node`. En ese momento deberiamos de ver lo siguiente:
+
+![version node correcta](./screen-captures/añadir-proyecto-node/version-node-correcta.png)
 
 - Esa será la ruta a introducir en el archivo de configuración de `supervisor`. Nos dirigimos con el usuario `ubuntu` a `cd /etc/supervisor/conf.d` y actualizamos el archivo de configuración que creamos anteriormente, en mi caso `chat.conf`, haciendo `sudo nano chat.conf` y dejando el archivo tal que así:
 
@@ -574,6 +578,22 @@ autorestart=true # Autoreiniciar
   - Para que los cambios se hagan activos, deberemos de hacer `logout` y volver a conectarnos con el usuario. Cuando nos conectemos, haciendo un `nvm ls` podremos ver como ya tenemos por defecto la version 12 de node:
 
     ![nvm version default fixed](./screen-captures/añadir-proyecto-node/nvm-version-default-fixed.png)
+
+#### Comprobando que supervisor reinicia el servicio
+
+- Para comprobar que el chat, actualmente funciona sin estar ejecutandolo desde el usuario `chat`, podemos ir al navegador con la dirección donde se encuentre `<IP_PUBLICA>:3000>` o `<nombre_dominio>:3000` y veremos como sigue funcionando después de las últimas configuraciones, pero, que pasa si matamos el proceso?
+
+- Para verlo, primero buscaremos el `PID` del proceso a ***'matar'***. Tenemos 2 formas de encontrarlo:
+
+  1. Haciendo uso del comando `ps aux | grep <nombre_del_proceso>` en mi caso será `ps aux | grep chat` y esto me mostrará lo siguiente: 
+
+  ![pid proceso](./screen-captures/añadir-proyecto-node/pid-proceso.png)
+
+  2. Haciendo uso de `supervisor`, ejecutando `sudo supervisorctl status`
+
+  ![pid proceso supervisorctl](./screen-captures/añadir-proyecto-node/pid-proceso-supervisorctl.png)
+
+- Una vez tenemos el `PID` usaremos el comando `sudo kill <PID>`. No nos mostrará ningún mensaje
 
 ---
 
